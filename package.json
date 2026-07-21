@@ -1,0 +1,14 @@
+{
+  "name": "pnac-syllabus",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Preston Northcote Angling Club — Syllabus 2026/27 (installable PWA + Excel data pipeline).",
+  "type": "module",
+  "scripts": {
+    "data": "node scripts/xlsx-to-trips.mjs",
+    "serve": "npx --yes http-server -p 8731 -c-1 ."
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

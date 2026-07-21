@@ -1,0 +1,16 @@
+{
+  "name": "Preston Northcote Angling Club — Syllabus 2026/27",
+  "short_name": "PNAC",
+  "description": "The Preston Northcote Angling Club syllabus for the 2026/27 season.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a2142",
+  "theme_color": "#0a2142",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,8 @@
+node_modules
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Excel lock files
+~$*
