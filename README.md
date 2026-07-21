@@ -67,3 +67,10 @@ GitHub Pages, Netlify, Cloudflare Pages, or your own web server — then:
 
 - **Android / Chrome:** an "Install app" button appears automatically.
 - **iOS / Safari:** use Share → *Add to Home Screen* (the app shows a hint).
+
+## Credits
+
+App icon: brown trout (*Salmo trutta*) illustration by **Duane Raver / U.S. Fish and
+Wildlife Service** — a work of the U.S. federal government, in the **public domain**.
+It has been recomposed here (background removed, rotated into a leaping pose over water).
+Source: <https://commons.wikimedia.org/wiki/File:Brown_trout_FWS_white_background.jpg>
