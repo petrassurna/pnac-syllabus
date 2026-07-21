@@ -98,10 +98,13 @@
     /* ---------- list ---------- */
     main { padding: 8px 14px 130px; }
 
+    .month-group { position: relative; }
     .month {
-      position: sticky; top: calc(var(--hh) - 4px); z-index: 5;
+      position: sticky; top: calc(var(--hh) - 1px); z-index: 5;
       font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--muted); padding: 16px 6px 8px;
+      color: var(--muted); padding: 14px 6px 8px;
+      background: linear-gradient(180deg, rgba(7, 26, 51, 0.94) 72%, rgba(7, 26, 51, 0));
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
 
     .card {
@@ -284,15 +287,18 @@
       list.innerHTML = '';
       if (!items.length) { list.innerHTML = '<div class="empty">No dates for this filter.</div>'; return; }
 
-      let curMonth = '';
+      let curMonth = '', group = null;
       items.forEach((t, i) => {
         const dt = startDate(t.start);
         const mk = MONTHS[dt.getMonth()] + ' ' + dt.getFullYear();
         if (mk !== curMonth) {
           curMonth = mk;
+          group = document.createElement('section');
+          group.className = 'month-group';
           const h = document.createElement('div');
           h.className = 'month'; h.textContent = mk;
-          list.appendChild(h);
+          group.appendChild(h);
+          list.appendChild(group);
         }
         const isNext = i === nextIdx;
         const card = document.createElement('div');
@@ -306,7 +312,7 @@
              <span class="badge"><span class="dot" style="${accentStyle(t)}"></span>${t.type}</span>
            </div>
            ${isNext ? '<span class="next-tag">NEXT UP</span>' : ''}`;
-        list.appendChild(card);
+        group.appendChild(card);
       });
 
       const next = document.getElementById('next-card');
