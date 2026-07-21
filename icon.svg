@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#10b9c7"/>
+        <stop offset="1" stop-color="#0a2142"/>
+      </linearGradient>
+    </defs>
+    <rect width="512" height="512" fill="url(#bg)"/>
+    
+    <g transform="translate(256 256) scale(0.94) rotate(-28) translate(-256 -256)">
+
+      <!-- fins + tail (behind), ochre with dark outline -->
+      <g fill="#c6a24c" stroke="#39291a" stroke-width="6" stroke-linejoin="round">
+        <path d="M214 190 C238 142 292 138 320 184 C286 180 246 182 214 190 Z"/>   <!-- dorsal -->
+        <path d="M150 200 C160 182 180 182 186 200 Z"/>                             <!-- adipose -->
+        <path d="M384 286 C418 306 424 330 398 328 C386 316 382 300 384 286 Z"/>   <!-- pectoral -->
+        <path d="M262 318 C276 350 302 356 306 332 C294 324 278 320 262 318 Z"/>   <!-- pelvic -->
+        <path d="M172 314 C180 344 202 348 206 328 C196 322 184 318 172 314 Z"/>   <!-- anal -->
+        <path d="M120 250 L40 194 L86 250 L64 256 L86 262 L40 318 L120 262 C114 258 114 254 120 250 Z"/> <!-- caudal, forked -->
+      </g>
+      <g stroke="#8a6d2f" stroke-width="3" fill="none" stroke-linecap="round">
+        <path d="M62 208 L110 256 M56 256 L118 256 M62 304 L110 258"/>
+        <path d="M234 178 L252 152 M268 172 L282 148 M298 174 L308 156"/>
+      </g>
+
+      <!-- body -->
+      <path fill="#8f9d55" d="M476 256 C456 210 398 190 330 190 C248 186 162 200 116 246 C110 252 110 260 116 266 C162 312 248 326 330 322 C398 322 456 302 476 256 Z"/>
+      <path fill="#efe6c9" d="M476 256 C456 302 398 322 330 322 C248 326 162 312 116 266 C172 300 250 300 322 292 C398 282 456 270 476 256 Z"/>
+      <path fill="none" stroke="#e8895a" stroke-width="13" stroke-linecap="round" d="M120 272 C214 262 330 250 452 248"/>
+
+      <!-- spots -->
+      <g fill="#39291a">
+        <circle cx="250" cy="216" r="9"/><circle cx="290" cy="208" r="8"/>
+        <circle cx="322" cy="208" r="7"/><circle cx="214" cy="226" r="8"/>
+        <circle cx="182" cy="234" r="7"/><circle cx="152" cy="242" r="7"/>
+        <circle cx="278" cy="230" r="7"/><circle cx="232" cy="242" r="6"/>
+        <circle cx="312" cy="230" r="6"/><circle cx="346" cy="224" r="6"/>
+        <circle cx="370" cy="234" r="5"/>
+        <circle cx="72" cy="228" r="5"/><circle cx="74" cy="292" r="5"/>
+      </g>
+
+      <!-- clean silhouette outline on top -->
+      <path fill="none" stroke="#39291a" stroke-width="9" stroke-linejoin="round" d="M476 256 C456 210 398 190 330 190 C248 186 162 200 116 246 C110 252 110 260 116 266 C162 312 248 326 330 322 C398 322 456 302 476 256 Z"/>
+
+      <!-- head: gill, open mouth, eye -->
+      <path fill="none" stroke="#39291a" stroke-width="6" stroke-linecap="round" d="M372 200 C360 232 362 282 376 310"/>
+      <path fill="#b23b28" stroke="#39291a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" d="M470 244 L500 240 L492 258 L470 262 Z"/>
+      <path fill="none" stroke="#39291a" stroke-width="5" stroke-linecap="round" d="M452 256 L474 256"/>
+      <circle cx="432" cy="238" r="13" fill="#fff" stroke="#39291a" stroke-width="5"/>
+      <circle cx="434" cy="239" r="6.5" fill="#241a10"/>
+    </g>
+  </svg>
