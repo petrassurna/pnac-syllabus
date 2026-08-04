@@ -20,23 +20,50 @@ tooling is a small script that turns the syllabus spreadsheet into the app's dat
 | Path | Role |
 |------|------|
 | `index.html` | The whole app (HTML + CSS + JS inline) |
-| `trips.json` | The app's data — **generated** from the spreadsheet (do not hand-edit) |
-| `Syllabus.xlsx` | **Source of truth** — the syllabus (Date, Type, Location) |
+| `trips.json` | The app's data — **generated** (do not hand-edit) |
+| `Syllabus 2026-2027 ver4.xlsx` | **Source of truth** — the committee's calendar-style workbook |
+| `Syllabus.xlsx` | Flattened intermediate (Date, Type, Location) — **generated** |
+| `scripts/calendar-to-syllabus.mjs` | Converts the committee workbook → `Syllabus.xlsx` |
 | `scripts/xlsx-to-trips.mjs` | Converts `Syllabus.xlsx` → `trips.json` |
 | `manifest.webmanifest`, `sw.js` | PWA manifest + service worker |
 | `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | App icons |
 
 ## Data pipeline (Excel → app)
 
-The app reads `trips.json`. That file is **generated from `Syllabus.xlsx`** — so
-when the final syllabus is ready, update the spreadsheet and regenerate:
+The app reads `trips.json`, which is generated in two steps:
 
-```bash
-npm install          # once, installs the xlsx reader
-npm run data         # reads Syllabus.xlsx -> writes trips.json
+```
+Syllabus 2026-2027 ver4.xlsx  --npm run convert-->  Syllabus.xlsx  --npm run data-->  trips.json
 ```
 
-### Spreadsheet format (`Syllabus.xlsx`, first sheet, no header row)
+The committee maintains the syllabus as a month-by-month calendar grid (one row per
+*day* of each outing). `npm run convert` folds that into the flat three-column
+`Syllabus.xlsx`; `npm run data` turns that into the app's JSON.
+
+```bash
+npm install                                       # once, installs the xlsx reader
+npm run convert -- "Syllabus 2026-2027 ver4.xlsx" # calendar workbook -> Syllabus.xlsx
+npm run data                                      # Syllabus.xlsx      -> trips.json
+```
+
+`npm run convert` prints every row it produced, plus warnings where a date and its
+day name disagree — worth reading, since those are usually mistakes in the source.
+
+### Committee workbook format (first sheet)
+
+| Column | Meaning |
+|--------|---------|
+| A — Day name | `Saturday`, `Monday (Labour Day)`, … (used only to sanity-check the date) |
+| B — Day number | Day of the month; the enclosing month header row supplies month + year |
+| C — Description | `F/W`, `S/W` or `S/E` prefix + venue, **or** an event name (`AGM`, `Howqua W/Bee`, …) |
+| D, E | Donor and trophy value — ignored |
+
+Month header rows are `<Month name>` in A and `<year>` in B. Blank rows separate
+outings; consecutive dated rows fold into one entry, and a gap in the dates starts a
+new one. Venue wording that needs tidying (typos, notes on follow-on rows) lives in
+the `EVENTS` / `LOCATIONS` tables at the top of `scripts/calendar-to-syllabus.mjs`.
+
+### Intermediate format (`Syllabus.xlsx`, first sheet, no header row)
 
 | Column | Meaning | Examples |
 |--------|---------|----------|

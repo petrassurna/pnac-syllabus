@@ -373,7 +373,24 @@
 
     // service worker
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+      // Already controlled means this is an existing install, so a change of
+      // controller is a new deploy taking over — reload once to show it. (On a
+      // first install the SW claims an uncontrolled page; don't reload for that.)
+      if (navigator.serviceWorker.controller) {
+        let reloading = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (reloading) return;
+          reloading = true;
+          location.reload();
+        });
+      }
+      window.addEventListener('load', () => {
+        // updateViaCache:'none' stops sw.js itself being served from the HTTP
+        // cache, which would otherwise pin people to the old deploy.
+        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+          .then((reg) => reg.update())
+          .catch(() => {});
+      });
     }
 
     // install prompt (Android / desktop Chrome)

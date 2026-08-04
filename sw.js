@@ -1,4 +1,6 @@
-const CACHE = 'pnac-syllabus-v1';
+// Bump this on every deploy. The shell is cache-first, so a new name is what
+// evicts the old index.html/icons from everyone's installed copy.
+const CACHE = 'pnac-syllabus-v2';
 const SHELL = [
   './',
   './index.html',
