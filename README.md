@@ -122,13 +122,71 @@ npm run serve        # http://localhost:8731
 
 (Any static server works. A service worker needs a secure context; `localhost` counts.)
 
-## Deploy (for phone install)
+## Deploy
 
-PWA install requires **HTTPS**. Host this folder on any static host —
-GitHub Pages, Netlify, Cloudflare Pages, or your own web server — then:
+Live at **<https://pnac-syllabus.vercel.app/>**, deployed by Vercel from `main` —
+**pushing to GitHub is what publishes to members' phones.** A build lands in a minute
+or two. There is nothing to run by hand.
 
-- **Android / Chrome:** an "Install app" button appears automatically.
-- **iOS / Safari:** use Share → *Add to Home Screen* (the app shows a hint).
+```bash
+npm run data                        # regenerate after editing the workbook
+git add -A && git commit -m "..."
+git push origin main                # this is the deploy
+```
+
+**Verify against the live URL afterwards — don't assume the push worked.** Give the
+build a minute, then (PowerShell):
+
+```powershell
+$d = (Invoke-WebRequest "https://pnac-syllabus.vercel.app/trips.json" `
+      -Headers @{'Cache-Control'='no-cache'} -UseBasicParsing).Content | ConvertFrom-Json
+"$($d.Count) entries; first $($d[0].display), last $($d[-1].display)"
+```
+
+Compare that count against what `npm run data` printed locally. They should match.
+
+PWA install needs HTTPS, which Vercel provides. Android/Chrome shows an "Install app"
+button; iOS/Safari uses Share → *Add to Home Screen* (the app shows a hint).
+
+### How updates reach phones that already have the app
+
+This is the part that bites. The service worker serves `trips.json` **network-first**,
+so *data* changes land on the next online launch by themselves. Everything else —
+`index.html`, the icons — is **cache-first and precached**, so an installed copy is
+pinned to whatever shell it downloaded until the cache *name* changes.
+
+> **⚠️ Bump `CACHE` in `sw.js` whenever you change `index.html`.**
+> Forget, and members keep the old app indefinitely. The `activate` handler deletes
+> every cache that isn't the current name, so a new name is what evicts the old one.
+> A data-only change does **not** need a bump.
+
+Two supporting pieces, already in place in `index.html`:
+
+- `register('sw.js', { updateViaCache: 'none' })` — stops `sw.js` *itself* being
+  served from the HTTP cache, the classic reason an update silently never arrives.
+- a `controllerchange` listener that reloads once when a new worker takes over, so
+  the update shows on the launch that fetches it rather than the one after. It is
+  attached only when a controller already exists, or a first install would reload
+  on its own `clients.claim()`.
+
+If someone is ever truly wedged, deleting and re-adding the home-screen icon is the
+reset.
+
+## Open questions for the committee
+
+Judgement calls in the current data that nobody has confirmed:
+
+- **Presentation Night is treated as one day.** The club confirmed Christmas Tree is;
+  Presentation Night has the identical shape in the workbook (Saturday named, blank
+  Sunday) and a *night* can't span two days — but it wasn't explicitly confirmed.
+- **Working bees and trips with that same blank-Sunday padding are left as two days**,
+  on the assumption they really do run the weekend.
+- **Every `Clubrooms` is inferred**, since the workbook names no venue for any club
+  function. The club meets at 270 Murray Road, Preston, so it's a fair inference —
+  but it isn't sourced.
+- **Venues are lightly tidied** (typos fixed, notes merged in) *except* the two kids
+  weekends, which the club asked to keep verbatim. That inconsistency is deliberate
+  but unresolved — see `LOCATIONS`.
 
 ## Credits
 
