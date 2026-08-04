@@ -50,7 +50,7 @@
   },
   {
     "start": "2026-08-08",
-    "display": "8-9 August 2026",
+    "display": "8 August 2026",
     "type": "Presentation Night",
     "location": "Clubrooms",
     "kind": "event"
@@ -71,9 +71,16 @@
   },
   {
     "start": "2026-09-05",
-    "display": "5-6 September 2026",
+    "display": "5 September 2026",
     "type": "Freshwater",
-    "location": "Goulburn & tributaries (day comp — Eildon Pondage to Hume Hwy bridge)",
+    "location": "Goulburn & tributaries (day comp)",
+    "kind": "trip"
+  },
+  {
+    "start": "2026-09-06",
+    "display": "6 September 2026",
+    "type": "Freshwater",
+    "location": "Eildon Pondage to Hume Hwy Bridge",
     "kind": "trip"
   },
   {
@@ -86,14 +93,7 @@
   {
     "start": "2026-09-19",
     "display": "19-20 September 2026",
-    "type": "Saltwater",
-    "location": "Werribee (weather dependent)",
-    "kind": "trip"
-  },
-  {
-    "start": "2026-09-19",
-    "display": "19-20 September 2026",
-    "type": "Surf/Estuary",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Werribee (weather dependent)",
     "kind": "trip"
   },
@@ -107,28 +107,14 @@
   {
     "start": "2026-09-25",
     "display": "25-27 September 2026",
-    "type": "Saltwater",
-    "location": "Port Albert",
-    "kind": "trip"
-  },
-  {
-    "start": "2026-09-25",
-    "display": "25-27 September 2026",
-    "type": "Surf/Estuary",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Port Albert",
     "kind": "trip"
   },
   {
     "start": "2026-10-10",
     "display": "10-11 October 2026",
-    "type": "Surf/Estuary",
-    "location": "Go Anywhere (WICR 7pm; BBQ clubrooms Sunday 7pm)",
-    "kind": "trip"
-  },
-  {
-    "start": "2026-10-10",
-    "display": "10-11 October 2026",
-    "type": "Saltwater",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Go Anywhere (WICR 7pm; BBQ clubrooms Sunday 7pm)",
     "kind": "trip"
   },
@@ -198,20 +184,13 @@
   {
     "start": "2026-11-28",
     "display": "28-29 November 2026",
-    "type": "Saltwater",
-    "location": "Port Albert",
-    "kind": "trip"
-  },
-  {
-    "start": "2026-11-28",
-    "display": "28-29 November 2026",
-    "type": "Surf/Estuary",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Port Albert",
     "kind": "trip"
   },
   {
     "start": "2026-12-05",
-    "display": "5-6 December 2026",
+    "display": "5 December 2026",
     "type": "Christmas Tree",
     "location": "Clubrooms",
     "kind": "event"
@@ -240,14 +219,7 @@
   {
     "start": "2027-01-23",
     "display": "23-26 January 2027",
-    "type": "Surf/Estuary",
-    "location": "Port Albert",
-    "kind": "trip"
-  },
-  {
-    "start": "2027-01-23",
-    "display": "23-26 January 2027",
-    "type": "Saltwater",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Port Albert",
     "kind": "trip"
   },
@@ -261,14 +233,7 @@
   {
     "start": "2027-02-13",
     "display": "13-14 February 2027",
-    "type": "Saltwater",
-    "location": "Port Albert",
-    "kind": "trip"
-  },
-  {
-    "start": "2027-02-13",
-    "display": "13-14 February 2027",
-    "type": "Surf/Estuary",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Port Albert",
     "kind": "trip"
   },
@@ -296,14 +261,7 @@
   {
     "start": "2027-03-06",
     "display": "6-8 March 2027",
-    "type": "Saltwater",
-    "location": "Port Albert (interclub)",
-    "kind": "trip"
-  },
-  {
-    "start": "2027-03-06",
-    "display": "6-8 March 2027",
-    "type": "Surf/Estuary",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Port Albert (interclub)",
     "kind": "trip"
   },
@@ -394,14 +352,7 @@
   {
     "start": "2027-06-12",
     "display": "12-14 June 2027",
-    "type": "Saltwater",
-    "location": "Port Albert",
-    "kind": "trip"
-  },
-  {
-    "start": "2027-06-12",
-    "display": "12-14 June 2027",
-    "type": "Surf/Estuary",
+    "type": "Saltwater & Surf/Estuary",
     "location": "Port Albert",
     "kind": "trip"
   },
@@ -442,9 +393,9 @@
   },
   {
     "start": "2027-08-07",
-    "display": "7-8 August 2027",
+    "display": "7 August 2027",
     "type": "Presentation Night",
-    "location": "Clubrooms",
+    "location": "Venue to be confirmed",
     "kind": "event"
   },
   {

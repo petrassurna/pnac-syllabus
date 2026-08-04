@@ -70,7 +70,7 @@ const LOCATIONS = {
   'fwhowquaareaincnillahcootie':            'Howqua Area (inc. Nillahcootie)',
   'swcliftonsprings':                       'Clifton Springs (one day, weather dependent)',
   'swbarwonheads':                          'Barwon Heads',
-  'fwgoulburntributariesdaycomp':           'Goulburn & tributaries (day comp — Eildon Pondage to Hume Hwy bridge)',
+  'fwgoulburntributariesdaycomp':           'Goulburn & tributaries (day comp)',
   'fwhowquajohnkirkmansheildhowqauassoc':   'Howqua (John Kirkman Shield — Howqua Assoc.)',
   'swwerribeeweatherdependant':             'Werribee (weather dependent)',
   'sewerribeeweatherdependant':             'Werribee (weather dependent)',
@@ -96,6 +96,42 @@ const LOCATIONS = {
   'swcorinellaweatherdependant':            'Corinella (weather dependent)',
   'semaribyrnong3pmweighinatessendonanglers': 'Maribyrnong (3pm weigh-in at Essendon Anglers)',
   'fwgoanywherewicr700pm':                  'Go Anywhere (WICR 7pm; return to clubrooms to be eligible — BBQ)',
+};
+
+/**
+ * Venue for one specific occurrence, overriding the EVENTS table. Keyed by the
+ * entry's start date plus the squashed description, since the same function recurs
+ * each season and the two occurrences can differ.
+ */
+const VENUE_BY_DATE = {
+  // Not settled at the time ver4 went out. The workbook names no venue for any
+  // club function; the "Clubrooms" in EVENTS is inferred, so say so where it isn't.
+  '2027-08-07|presentationnight': 'Venue to be confirmed',
+};
+
+/**
+ * Evening functions that occupy one day only. The workbook pads them out with a
+ * blank-description row for the Sunday, which otherwise reads as a second day —
+ * unlike a working bee or a trip, where that same padding really does mean the
+ * outing runs the whole weekend.
+ */
+const SINGLE_DAY = new Set([
+  'christmastree',
+  'presentationnight',
+]);
+
+/**
+ * Descriptions that begin a NEW outing rather than annotating the one above them,
+ * as [type, location]. Consecutive dated rows normally fold into a single entry, so
+ * a second comp on the Sunday of a weekend — written without a blank row above it,
+ * and without a water-type prefix to give it away — would otherwise be swallowed as
+ * a note on the Saturday's comp. There is no reliable way to tell the two apart
+ * automatically, so each one is listed here explicitly.
+ */
+const SPLITS = {
+  // ver4 runs two separate day comps across the first weekend of September 2026:
+  // the Goulburn on the Saturday, Eildon Pondage on the Sunday.
+  'eildonpondagetohumehwybridge': ['Freshwater', 'Eildon Pondage to Hume Hwy Bridge'],
 };
 
 /**
@@ -135,13 +171,13 @@ function asMonthHeader(row) {
 /** Split column C into the app's type + location, or null if it isn't an outing. */
 function classify(desc) {
   const raw = tidy(desc);
-  const event = EVENTS[squash(raw)];
-  if (event) return { type: event[0], location: event[1], kind: 'event' };
+  const key = squash(raw);
+  const event = EVENTS[key];
+  if (event) return { type: event[0], location: event[1], kind: 'event', key };
 
   for (const [re, type] of TYPE_PREFIXES) {
     if (!re.test(raw)) continue;
-    const location = LOCATIONS[squash(raw)] ?? tidy(raw.replace(re, ''));
-    return { type, location, kind: 'trip' };
+    return { type, location: LOCATIONS[key] ?? tidy(raw.replace(re, '')), kind: 'trip', key };
   }
   return null; // column headers, stray notes, trailing prose
 }
@@ -209,12 +245,14 @@ function flush() {
   block = [];
   if (!dated.length || !named) return;
 
-  const first = dated[0].date, last = dated[dated.length - 1].date;
+  const first = dated[0].date;
+  const last = SINGLE_DAY.has(named.info.key) ? first : dated[dated.length - 1].date;
+  const start = isoOf(first);
   entries.push({
-    start: isoOf(first),
+    start,
     display: displayRange(first, last),
     type: named.info.type,
-    location: named.info.location,
+    location: VENUE_BY_DATE[`${start}|${named.info.key}`] ?? named.info.location,
     kind: named.info.kind,
   });
 }
@@ -228,7 +266,10 @@ for (const row of rows) {
 
   const [dayName, dayNum, desc] = cells;
   const hasDay = typeof dayNum === 'number' && dayNum >= 1 && dayNum <= 31;
-  const info = desc != null && String(desc).trim() !== '' ? classify(desc) : null;
+  const split = desc != null ? SPLITS[squash(desc)] : null;
+  const info = split
+    ? { type: split[0], location: split[1], kind: split[2] ?? 'trip' }
+    : (desc != null && String(desc).trim() !== '' ? classify(desc) : null);
 
   if (!hasDay) {
     // Undated line: a note attached to the current outing, or stray prose.
@@ -247,8 +288,9 @@ for (const row of rows) {
     cursor = { month: date[1], year: date[0] };
   }
 
-  // A jump in the dates means a new outing even without a blank row between them.
-  if (prevDated && !sameDate(date, dayAfter(prevDated.date))) flush();
+  // A jump in the dates, or a row listed in SPLITS, starts a new outing even
+  // without a blank row between them.
+  if (split || (prevDated && !sameDate(date, dayAfter(prevDated.date)))) flush();
 
   if (typeof dayName === 'string') {
     const expected = DAYS[new Date(date[0], date[1], date[2]).getDay()];
@@ -270,6 +312,26 @@ const trips = entries.filter((e) => {
   seen.add(key);
   return true;
 });
+
+/**
+ * The workbook lists Saltwater and Surf/Estuary as separate blocks even when they
+ * run the same dates at the same venue, because each carries its own trophies. To a
+ * member reading the app that's just the same weekend printed twice, so fold those
+ * pairs into one card. The app understands the combined type: it draws a two-tone
+ * accent, and its filter is a substring test, so the card still appears under both
+ * Saltwater and Surf/Estuary. Different venues stay separate.
+ */
+const merged = [];
+for (const trip of trips) {
+  const twin = merged.find((m) => m.start === trip.start && m.display === trip.display &&
+    m.location === trip.location &&
+    ((m.type === 'Saltwater' && trip.type === 'Surf/Estuary') ||
+     (m.type === 'Surf/Estuary' && trip.type === 'Saltwater')));
+  if (twin) twin.type = 'Saltwater & Surf/Estuary';
+  else merged.push(trip);
+}
+trips.length = 0;
+trips.push(...merged);
 
 trips.sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : x.location.localeCompare(y.location)));
 

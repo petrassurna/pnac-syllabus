@@ -69,9 +69,22 @@ Month header rows are `<Month name>` in A and `<year>` in B. Blank rows separate
 outings; consecutive dated rows fold into one entry, and a gap in the dates starts a
 new one.
 
+**Watch for two comps run back-to-back over one weekend.** Written without a blank
+row between them, and with the second lacking a water-type prefix, they look
+identical to a comp with a note on its second day — compare the Goulburn/Eildon
+Pondage weekend (two comps) with `SW Clifton Springs` / `(One day weather dependant)`
+(one comp plus a note). Nothing in the file distinguishes them, so each second comp
+has to be listed in the `SPLITS` table in the script.
+
 **Trips at two different venues on the same weekend should be separate blocks** — the
-app shows them as separate cards. Saltwater and Surf/Estuary at the *same* venue are
-also kept separate, since the workbook lists them as distinct competitions.
+app shows them as separate cards. Saltwater and Surf/Estuary blocks that share a
+venue *and* dates are folded into one `Saltwater & Surf/Estuary` card, which still
+appears under both filter chips; showing the same weekend twice just reads as a
+duplicate. Different venues stay separate.
+
+A blank-description row after an outing normally extends it to a second day. Evening
+functions listed that way (`CHRISTMAS TREE` on the Saturday, blank Sunday) are one
+day only, and are named in the `SINGLE_DAY` set.
 
 ### What the script produces
 
@@ -91,6 +104,11 @@ C has to be split into the two. That split lives in two tables at the top of
 - **`LOCATIONS`** — venue wording that needs more than having its `F/W`/`S/W`/`S/E`
   prefix stripped: typos, duplicated text, and notes stranded on an outing's
   follow-on rows. Anything not listed is just prefix-stripped and whitespace-tidied.
+- **`VENUE_BY_DATE`** — venue for one specific occurrence, overriding `EVENTS`, since
+  the same function recurs each season and the two can differ.
+
+**The workbook names no venue for any club function.** The `Clubrooms` in `EVENTS` is
+an inference, not sourced — worth checking against the committee before each season.
 
 **If a venue reads oddly in the app, edit those tables — not `trips.json`**, which is
 overwritten on every run. Keys are the workbook's own text squashed to lowercase
