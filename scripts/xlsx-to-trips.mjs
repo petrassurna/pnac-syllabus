@@ -98,9 +98,24 @@ const LOCATIONS = {
   'fwgoanywherewicr700pm':                  'Go Anywhere (WICR 7pm; return to clubrooms to be eligible — BBQ)',
 };
 
+/**
+ * Dates the workbook states wrongly, confirmed with the club. Keyed by the date as
+ * written plus the squashed description, so a correction can only ever fire on the
+ * exact row it was meant for. The day-name cross-check below is what surfaces these;
+ * once corrected the row stops warning, which is the signal the fix is right.
+ *
+ * The workbook is left untouched — it stays exactly as the committee sent it.
+ */
+const DATE_CORRECTIONS = {
+  // ver4 says "Thursday 24 March 2027", but the 24th is a Wednesday and club
+  // nights are Thursdays. Confirmed with the club: it should be the 25th.
+  '2027-03-24|noclubmeeting': '2027-03-25',
+};
+
 const squash = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
 const tidy = (s) => String(s).replace(/\s+/g, ' ').trim();
 const pad = (n) => String(n).padStart(2, '0');
+const isoOf = ([y, m, d]) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
 function monthIdx(name) {
   const key = tidy(name).toLowerCase();
@@ -196,7 +211,7 @@ function flush() {
 
   const first = dated[0].date, last = dated[dated.length - 1].date;
   entries.push({
-    start: `${first[0]}-${pad(first[1] + 1)}-${pad(first[2])}`,
+    start: isoOf(first),
     display: displayRange(first, last),
     type: named.info.type,
     location: named.info.location,
@@ -223,7 +238,14 @@ for (const row of rows) {
   if (!header) { warnings.push(`Dated row before any month header: ${JSON.stringify(cells)}`); continue; }
 
   const prevDated = [...block].reverse().find((r) => r.date);
-  const date = resolveDay(dayNum, prevDated?.date);
+  let date = resolveDay(dayNum, prevDated?.date);
+
+  const fix = DATE_CORRECTIONS[`${isoOf(date)}|${squash(desc ?? '')}`];
+  if (fix) {
+    const [fy, fm, fd] = fix.split('-').map(Number);
+    date = [fy, fm - 1, fd];
+    cursor = { month: date[1], year: date[0] };
+  }
 
   // A jump in the dates means a new outing even without a blank row between them.
   if (prevDated && !sameDate(date, dayAfter(prevDated.date))) flush();

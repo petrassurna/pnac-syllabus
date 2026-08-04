@@ -46,9 +46,15 @@ npm run data         # newest Syllabus*.xlsx in this folder -> trips.json
 next season's file drops straight in — it prints which one it used. Pass a path to
 override: `npm run data -- "some other file.xlsx"`.
 
-It also warns where a date and the day name beside it disagree. Read those — they're
-usually mistakes in the source. As of ver4 there is one: `Thursday 24 March 2027` is
-actually a Wednesday.
+It also cross-checks every date against the day name written beside it and warns on
+any disagreement. **Read those warnings** — they're mistakes in the source. A clean
+run means every date in the workbook is internally consistent.
+
+Where the club has confirmed the correct date, record it in the `DATE_CORRECTIONS`
+table at the top of the script rather than editing the workbook, which stays exactly
+as the committee sent it. A corrected row stops warning, so the check doubles as
+confirmation the fix is right. One is recorded so far: ver4 lists the March 2027
+"no club meeting" notice as Thursday the 24th, which is a Wednesday — it's the 25th.
 
 ### Workbook format (first sheet)
 
