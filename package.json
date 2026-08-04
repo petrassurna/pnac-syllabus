@@ -5,7 +5,6 @@
   "description": "Preston Northcote Angling Club — Syllabus 2026/27 (installable PWA + Excel data pipeline).",
   "type": "module",
   "scripts": {
-    "convert": "node scripts/calendar-to-syllabus.mjs",
     "data": "node scripts/xlsx-to-trips.mjs",
     "serve": "npx --yes http-server -p 8731 -c-1 ."
   },

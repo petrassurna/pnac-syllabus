@@ -21,35 +21,36 @@ tooling is a small script that turns the syllabus spreadsheet into the app's dat
 |------|------|
 | `index.html` | The whole app (HTML + CSS + JS inline) |
 | `trips.json` | The app's data — **generated** (do not hand-edit) |
-| `Syllabus 2026-2027 ver4.xlsx` | **Source of truth** — the committee's calendar-style workbook |
-| `Syllabus.xlsx` | Flattened intermediate (Date, Type, Location) — **generated** |
-| `scripts/calendar-to-syllabus.mjs` | Converts the committee workbook → `Syllabus.xlsx` |
-| `scripts/xlsx-to-trips.mjs` | Converts `Syllabus.xlsx` → `trips.json` |
+| `Syllabus 2026-2027 ver4.xlsx` | **The single source of truth** — the committee's workbook |
+| `scripts/xlsx-to-trips.mjs` | Converts the workbook → `trips.json` |
 | `manifest.webmanifest`, `sw.js` | PWA manifest + service worker |
 | `icon-*.png`, `apple-touch-icon.png`, `favicon-32.png` | App icons |
 
 ## Data pipeline (Excel → app)
 
-The app reads `trips.json`, which is generated in two steps:
+**The committee's workbook is the only source of trips.** The app reads `trips.json`,
+which is generated from it in one step:
 
 ```
-Syllabus 2026-2027 ver4.xlsx  --npm run convert-->  Syllabus.xlsx  --npm run data-->  trips.json
+Syllabus 2026-2027 ver4.xlsx  --npm run data-->  trips.json
 ```
 
-The committee maintains the syllabus as a month-by-month calendar grid (one row per
-*day* of each outing). `npm run convert` folds that into the flat three-column
-`Syllabus.xlsx`; `npm run data` turns that into the app's JSON.
+So when the syllabus changes, update the workbook and regenerate:
 
 ```bash
-npm install                                       # once, installs the xlsx reader
-npm run convert -- "Syllabus 2026-2027 ver4.xlsx" # calendar workbook -> Syllabus.xlsx
-npm run data                                      # Syllabus.xlsx      -> trips.json
+npm install          # once, installs the xlsx reader
+npm run data         # newest Syllabus*.xlsx in this folder -> trips.json
 ```
 
-`npm run convert` prints every row it produced, plus warnings where a date and its
-day name disagree — worth reading, since those are usually mistakes in the source.
+`npm run data` picks the highest-numbered `Syllabus*.xlsx` in the project root, so
+next season's file drops straight in — it prints which one it used. Pass a path to
+override: `npm run data -- "some other file.xlsx"`.
 
-### Committee workbook format (first sheet)
+It also warns where a date and the day name beside it disagree. Read those — they're
+usually mistakes in the source. As of ver4 there is one: `Thursday 24 March 2027` is
+actually a Wednesday.
+
+### Workbook format (first sheet)
 
 | Column | Meaning |
 |--------|---------|
@@ -60,24 +61,34 @@ day name disagree — worth reading, since those are usually mistakes in the sou
 
 Month header rows are `<Month name>` in A and `<year>` in B. Blank rows separate
 outings; consecutive dated rows fold into one entry, and a gap in the dates starts a
-new one. Venue wording that needs tidying (typos, notes on follow-on rows) lives in
-the `EVENTS` / `LOCATIONS` tables at the top of `scripts/calendar-to-syllabus.mjs`.
+new one.
 
-### Intermediate format (`Syllabus.xlsx`, first sheet, no header row)
+**Trips at two different venues on the same weekend should be separate blocks** — the
+app shows them as separate cards. Saltwater and Surf/Estuary at the *same* venue are
+also kept separate, since the workbook lists them as distinct competitions.
 
-| Column | Meaning | Examples |
-|--------|---------|----------|
-| A — Date | A real date for a single day, **or** a text range for a weekend/long weekend | `2026-10-26`  ·  `27-28 July 2026`  ·  `30 November - 1 December 2026` |
-| B — Type | Water type or event name | `Saltwater`, `Freshwater`, `Surf/Estuary`, `Saltwater & Surf/Estuary`, `Working Bee`, `AGM`, `Presentation Night`, `Kids Night` … |
-| C — Location | Place / venue | `Port Albert`, `Howqua`, `Clubrooms` … |
+### What the script produces
 
-The script derives, for each row:
-- `start` — an ISO date used for sorting and "next up" detection (parsed from the range text when A is a range);
-- `display` — the human date shown on the card;
-- `kind` — `trip` if Type contains Saltwater/Freshwater/Surf/Estuary, otherwise `event`.
+For each outing it writes:
+- `start` — ISO date of the first day, used for sorting and "next up" detection;
+- `display` — the human date shown on the card (`25-27 September 2026`);
+- `type` — `Saltwater` / `Freshwater` / `Surf/Estuary`, or an event name;
+- `location` — the venue shown as the card's title;
+- `kind` — `trip` or `event`, which drives the colour and the filter chips.
 
-**Trips at two different venues on the same weekend should be separate rows** — the
-app shows them as separate cards.
+The app needs `type` and `location` as separate fields, so each description in column
+C has to be split into the two. That split lives in two tables at the top of
+`scripts/xlsx-to-trips.mjs`:
+
+- **`EVENTS`** — maps a club event's description to its `[type, location]`
+  (`Howqua W/Bee` → `Working Bee` at `Howqua`).
+- **`LOCATIONS`** — venue wording that needs more than having its `F/W`/`S/W`/`S/E`
+  prefix stripped: typos, duplicated text, and notes stranded on an outing's
+  follow-on rows. Anything not listed is just prefix-stripped and whitespace-tidied.
+
+**If a venue reads oddly in the app, edit those tables — not `trips.json`**, which is
+overwritten on every run. Keys are the workbook's own text squashed to lowercase
+letters and digits, so spacing and punctuation drift in the source doesn't break them.
 
 ## Run locally
 
