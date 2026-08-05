@@ -160,35 +160,121 @@
     }
     .card.next .loc { padding-right: 70px; }
 
-    .empty { text-align: center; color: var(--muted); padding: 60px 20px; font-weight: 600; }
+    .empty { text-align: center; color: var(--muted); padding: 60px 20px; font-weight: 600; line-height: 1.6; }
+    .empty .retry {
+      display: inline-block; margin-top: 16px; font-family: inherit;
+      background: rgba(56, 189, 248, .16); color: #9fe3ff;
+      border: 1px solid rgba(127, 215, 255, .45); border-radius: 999px;
+      font-weight: 800; font-size: 14px; padding: 11px 20px; cursor: pointer;
+    }
+
+    .stale {
+      display: none; margin: 0 0 13px; padding: 8px 11px;
+      font-size: 12.5px; font-weight: 700; line-height: 1.4;
+      color: #fde68a; background: rgba(251, 191, 36, .12);
+      border: 1px solid rgba(251, 191, 36, .35); border-radius: 10px;
+    }
+    .stale.show { display: block; }
 
     /* ---------- install UI ---------- */
+    /* The pill is permanent until the app is actually installed: it never
+       hides itself after a tap, so nobody can lose the way in. */
     #install {
       position: fixed; left: 50%; transform: translateX(-50%);
       bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
       display: none; align-items: center; gap: 9px;
       background: linear-gradient(90deg, #38bdf8, #22d3ee); color: #041022;
-      font-weight: 800; font-size: 15px; letter-spacing: .3px;
-      border: none; padding: 13px 22px; border-radius: 999px; cursor: pointer;
+      font-weight: 800; font-size: 15.5px; letter-spacing: .3px;
+      border: none; padding: 14px 24px; border-radius: 999px; cursor: pointer;
       box-shadow: 0 14px 34px -10px rgba(56, 189, 248, 0.7); z-index: 30;
+      animation: install-in .5s ease .3s both;
     }
     #install.show { display: inline-flex; }
-
-    #ios-hint {
-      position: fixed; left: 12px; right: 12px;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
-      display: none; z-index: 30;
-      background: rgba(12, 34, 62, 0.97); backdrop-filter: blur(12px);
-      border: 1px solid var(--card-brd); border-radius: 16px; padding: 14px 16px;
-      box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+    #install svg { flex: 0 0 auto; }
+    @keyframes install-in {
+      from { opacity: 0; transform: translateX(-50%) translateY(14px) }
+      to { opacity: 1; transform: translateX(-50%) translateY(0) }
     }
-    #ios-hint.show { display: block; }
-    #ios-hint p { margin: 0; font-size: 13.5px; color: var(--txt); line-height: 1.45; }
-    #ios-hint .share { display: inline-block; transform: translateY(2px); }
-    #ios-hint button {
-      margin-top: 10px; background: rgba(255,255,255,.08); color: var(--txt);
-      border: 1px solid var(--card-brd); border-radius: 10px; padding: 7px 12px;
-      font-weight: 700; font-size: 12px; cursor: pointer;
+
+    /* second, always-on-screen entry point in the sticky header */
+    .install-mini {
+      margin-left: auto; flex: 0 0 auto; display: none; align-items: center; gap: 6px;
+      background: rgba(56, 189, 248, .16); color: #9fe3ff;
+      border: 1px solid rgba(127, 215, 255, .45); border-radius: 999px;
+      font-weight: 800; font-size: 12px; letter-spacing: .2px;
+      padding: 7px 12px; cursor: pointer; font-family: inherit;
+    }
+    .install-mini.show { display: inline-flex; }
+    .install-mini.show ~ .sub { display: none; }
+
+    /* ---------- how-to-install sheet ---------- */
+    #sheet[hidden] { display: none; }
+    #sheet { position: fixed; inset: 0; z-index: 40; }
+    #sheet .backdrop {
+      position: absolute; inset: 0; background: rgba(2, 10, 22, .66);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    }
+    #sheet .panel {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      max-width: 560px; margin: 0 auto;
+      background: #0c223e; border: 1px solid var(--card-brd); border-bottom: none;
+      border-radius: 22px 22px 0 0;
+      padding: 10px 20px calc(env(safe-area-inset-bottom, 0px) + 20px);
+      max-height: 88dvh; overflow-y: auto;
+      box-shadow: 0 -20px 60px -20px rgba(0, 0, 0, .9);
+      animation: sheet-up .28s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    @keyframes sheet-up { from { transform: translateY(100%) } to { transform: translateY(0) } }
+    @media (prefers-reduced-motion: reduce) {
+      #sheet .panel, #install { animation-duration: .01ms !important; }
+    }
+    #sheet .grab {
+      width: 40px; height: 4px; border-radius: 999px; background: rgba(255,255,255,.2);
+      margin: 4px auto 14px;
+    }
+    #sheet h2 { font-size: 19px; font-weight: 800; margin: 0 0 6px; letter-spacing: -.2px; }
+    #sheet .lead { margin: 0 0 16px; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+    #sheet .do-install {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; margin: 0 0 18px;
+      background: linear-gradient(90deg, #38bdf8, #22d3ee); color: #041022;
+      font-weight: 800; font-size: 17px; font-family: inherit;
+      border: none; padding: 16px; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 14px 34px -14px rgba(56, 189, 248, .8);
+    }
+    #sheet .do-install[hidden] { display: none; }
+
+    #sheet ol { margin: 0; padding-left: 22px; }
+    #sheet li { font-size: 16px; line-height: 1.55; margin-bottom: 11px; }
+    #sheet li b { color: #9fe3ff; }
+    #sheet .ico {
+      display: inline-flex; vertical-align: -4px; margin: 0 2px;
+      padding: 2px 5px; border-radius: 6px;
+      background: rgba(255,255,255,.09); border: 1px solid var(--card-brd);
+    }
+    #sheet details { margin-top: 14px; border-top: 1px solid var(--card-brd); padding-top: 12px; }
+    #sheet summary {
+      font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer;
+      list-style: none;
+    }
+    #sheet summary::-webkit-details-marker { display: none; }
+    #sheet summary::after { content: ' ▾'; }
+    #sheet details[open] summary::after { content: ' ▴'; }
+    #sheet .alt-guide { margin-top: 12px; }
+    #sheet .alt-guide h3 {
+      font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 6px;
+    }
+    #sheet .alt-guide ol li { font-size: 13.5px; margin-bottom: 5px; }
+    #sheet .close {
+      margin-top: 18px; width: 100%; background: rgba(255,255,255,.08); color: var(--txt);
+      border: 1px solid var(--card-brd); border-radius: 12px; padding: 14px;
+      font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit;
+    }
+    #sheet .never {
+      display: block; margin: 12px auto 0; background: none; border: none;
+      color: var(--muted); font-size: 12.5px; font-family: inherit;
+      text-decoration: underline; cursor: pointer; padding: 4px;
     }
 
     /* ---------- intro splash ---------- */
@@ -247,10 +333,15 @@
       <div class="brand">
         <img src="icon-192.png" alt="" />
         <span class="name">PNAC</span>
+        <button class="install-mini" id="install-mini" type="button">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
+          Add to phone
+        </button>
         <span class="sub" id="count">2026 / 27 Season</span>
       </div>
       <h1>Syllabus</h1>
       <p class="club-name">Preston Northcote Angling Club · 2026 – 27</p>
+      <p class="stale" id="stale">⚠ No internet — showing the dates saved on this phone.</p>
       <div class="filters" id="filters">
         <button class="chip" data-f="All" aria-pressed="true">All</button>
         <button class="chip" data-f="Saltwater" aria-pressed="false"><span class="dot" style="background:var(--salt)"></span>Saltwater</button>
@@ -263,11 +354,33 @@
     <main id="list"></main>
   </div>
 
-  <button id="install">⬇ Install app</button>
+  <button id="install">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
+    Put this on my phone
+  </button>
 
-  <div id="ios-hint">
-    <p>Install this app: tap the <b>Share</b> <span class="share">⎋</span> button, then <b>“Add to Home Screen”</b>.</p>
-    <button id="ios-dismiss">Got it</button>
+  <div id="sheet" hidden>
+    <div class="backdrop" data-close></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="grab"></div>
+      <h2 id="sheet-title">Keep the syllabus on your phone</h2>
+      <p class="lead">Add it to your home screen and it opens like an app — one tap, works with no phone signal, and updates itself when dates change.</p>
+
+      <button id="sheet-install" class="do-install" hidden>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
+        Add it now
+      </button>
+
+      <ol id="sheet-steps"></ol>
+
+      <details>
+        <summary>Using a different phone or browser?</summary>
+        <div id="sheet-alts"></div>
+      </details>
+
+      <button class="close" data-close>Close</button>
+      <button class="never" id="sheet-never">Don’t show this again</button>
+    </div>
   </div>
 
   <script>
@@ -296,7 +409,7 @@
     let TRIPS = [];
     let filter = 'All';
 
-    function render() {
+    function render(silent) {
       const list = document.getElementById('list');
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const items = TRIPS.filter((t) => matches(t, filter));
@@ -335,8 +448,12 @@
         group.appendChild(card);
       });
 
-      const next = document.getElementById('next-card');
-      if (next) requestAnimationFrame(() => setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60));
+      // Jump to the next trip when the view changes, but not on a background
+      // data refresh — that would yank the page out from under whoever's reading.
+      if (!silent) {
+        const next = document.getElementById('next-card');
+        if (next) requestAnimationFrame(() => setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60));
+      }
     }
 
     // filters
@@ -348,11 +465,50 @@
       render();
     });
 
-    // load data
-    fetch('trips.json', { cache: 'no-cache' })
-      .then((r) => r.json())
-      .then((d) => { TRIPS = d; document.getElementById('count').textContent = d.length + ' dates · 2026/27'; render(); })
-      .catch(() => { document.getElementById('list').innerHTML = '<div class="empty">Could not load syllabus.</div>'; });
+    // ---------- load data ----------
+    // Every launch asks the network first (the service worker does the same),
+    // so a re-published syllabus reaches phones without anyone reinstalling.
+    const staleBar = document.getElementById('stale');
+    let lastLoad = 0, lastRender = 0;
+
+    function setStale(on) {
+      staleBar.classList.toggle('show', on);
+      syncHeader();
+    }
+
+    function loadTrips() {
+      return fetch('trips.json', { cache: 'no-cache' })
+        .then((r) => {
+          if (!r.ok) throw new Error('status ' + r.status);
+          const cached = r.headers.get('X-From-Cache') === '1';
+          return r.json().then((d) => ({ d, cached }));
+        })
+        .then(({ d, cached }) => {
+          TRIPS = d;
+          lastLoad = Date.now();
+          document.getElementById('count').textContent = d.length + ' dates · 2026/27';
+          setStale(cached);
+          render(lastRender > 0);
+          lastRender++;
+        })
+        .catch(() => {
+          // Never fail silently: either flag the saved copy we're still showing,
+          // or offer a retry instead of a dead end.
+          if (TRIPS.length) { setStale(true); return; }
+          document.getElementById('list').innerHTML =
+            '<div class="empty">Could not load the syllabus.<br />Check your internet connection.' +
+            '<br /><button class="retry" id="retry">Try again</button></div>';
+          document.getElementById('retry').addEventListener('click', loadTrips);
+        });
+    }
+    loadTrips();
+
+    // An installed app is resumed, not reloaded — without this a member who
+    // leaves it open for a month keeps seeing the dates it launched with.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastLoad > 60000) loadTrips();
+    });
+    window.addEventListener('online', loadTrips);
 
     // keep sticky offsets in sync with the actual (variable) header height
     const header = document.querySelector('header.top');
@@ -393,32 +549,119 @@
       });
     }
 
-    // install prompt (Android / desktop Chrome)
-    let deferred = null;
+    /* ---------- install ----------
+       Chrome decides whether to fire beforeinstallprompt, and iOS Safari never
+       does — so the native dialog can't be forced. Everything below therefore
+       works with no browser cooperation at all: two permanent buttons plus a
+       help sheet that opens itself, and the native prompt is used as a bonus
+       whenever the browser happens to offer it. */
+
     const installBtn = document.getElementById('install');
+    const installMini = document.getElementById('install-mini');
+    const sheet = document.getElementById('sheet');
+    const sheetInstall = document.getElementById('sheet-install');
     const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const ua = navigator.userAgent;
+    const isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    const isAndroid = /android/i.test(ua);
+    let deferred = null;
+
+    const SHARE_ICO = '<span class="ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m8 7 4-4 4 4"/><path d="M20 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/></svg></span>';
+
+    const GUIDES = {
+      ios: {
+        label: 'iPhone or iPad',
+        steps: [
+          'Tap the <b>Share</b> button ' + SHARE_ICO + ' — at the bottom of the screen in Safari, or in the address bar in Chrome.',
+          'Scroll down the list and tap <b>Add to Home Screen</b>.',
+          'Tap <b>Add</b> in the top corner. The PNAC fish appears on your home screen.'
+        ]
+      },
+      android: {
+        label: 'Android phone',
+        steps: [
+          'Tap the <b>⋮</b> menu button in the top right of the browser.',
+          'Tap <b>Install app</b>, or <b>Add to Home screen</b>.',
+          'Tap <b>Install</b> to confirm. The PNAC fish appears on your home screen.'
+        ]
+      },
+      desktop: {
+        label: 'Computer',
+        steps: [
+          'Look for the <b>install</b> icon at the right-hand end of the address bar.',
+          'Click it, then click <b>Install</b>.'
+        ]
+      }
+    };
+
+    const platform = isIOS ? 'ios' : isAndroid ? 'android' : 'desktop';
+
+    function fillSheet() {
+      document.getElementById('sheet-steps').innerHTML =
+        GUIDES[platform].steps.map((s) => `<li>${s}</li>`).join('');
+      document.getElementById('sheet-alts').innerHTML =
+        Object.keys(GUIDES).filter((k) => k !== platform).map((k) =>
+          `<div class="alt-guide"><h3>${GUIDES[k].label}</h3><ol>` +
+          GUIDES[k].steps.map((s) => `<li>${s}</li>`).join('') + '</ol></div>'
+        ).join('');
+    }
+    fillSheet();
+
+    function openSheet() {
+      sheet.hidden = false;
+      sheetInstall.hidden = !deferred;
+    }
+    function closeSheet() { sheet.hidden = true; }
+
+    sheet.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeSheet(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
+
+    // Both permanent buttons: use the real prompt if the browser gave us one,
+    // otherwise show the instructions. Neither button ever hides on a tap.
+    async function installAction() {
+      if (deferred) {
+        const e = deferred;
+        deferred = null;             // a prompt event is single-use
+        sheetInstall.hidden = true;
+        e.prompt();
+        const { outcome } = await e.userChoice;
+        if (outcome === 'accepted') closeSheet();
+        return;
+      }
+      openSheet();
+    }
+    installBtn.addEventListener('click', installAction);
+    installMini.addEventListener('click', installAction);
+    sheetInstall.addEventListener('click', installAction);
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferred = e;
-      if (!standalone) installBtn.classList.add('show');
+      e.preventDefault();
+      deferred = e;
+      if (!sheet.hidden) sheetInstall.hidden = false;
     });
-    installBtn.addEventListener('click', async () => {
-      if (!deferred) return;
-      deferred.prompt();
-      await deferred.userChoice;
-      deferred = null; installBtn.classList.remove('show');
-    });
-    window.addEventListener('appinstalled', () => installBtn.classList.remove('show'));
 
-    // iOS install hint (Safari has no beforeinstallprompt)
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isSafari = isIOS && !/crios|fxios/i.test(navigator.userAgent);
-    if (isIOS && isSafari && !standalone && !localStorage.getItem('iosHintDismissed')) {
-      setTimeout(() => document.getElementById('ios-hint').classList.add('show'), 1200);
+    function hideInstallUI() {
+      installBtn.classList.remove('show');
+      installMini.classList.remove('show');
+      closeSheet();
     }
-    document.getElementById('ios-dismiss').addEventListener('click', () => {
-      document.getElementById('ios-hint').classList.remove('show');
-      localStorage.setItem('iosHintDismissed', '1');
+    window.addEventListener('appinstalled', hideInstallUI);
+
+    if (!standalone) {
+      installBtn.classList.add('show');
+      installMini.classList.add('show');
+      syncHeader();
+
+      // Open the instructions unprompted on every visit until they've either
+      // installed it or opted out — members shouldn't have to go looking.
+      if (!localStorage.getItem('installHelpOff')) {
+        setTimeout(openSheet, reduce ? 700 : 3200); // after the splash has faded
+      }
+    }
+
+    document.getElementById('sheet-never').addEventListener('click', () => {
+      localStorage.setItem('installHelpOff', '1');
+      closeSheet();
     });
   </script>
 </body>
